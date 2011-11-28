@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web;
 using GiveCRM.Web.Controllers;
 using GiveCRM.BusinessLogic.ExcelImport;
+using MvcContrib.TestHelper;
 using NSubstitute;
 using NUnit.Framework;
 using System.Web.Mvc;
@@ -31,7 +32,7 @@ namespace GiveCRM.Admin.Web.Tests
         public void ReturnToIndexView_WhenNoFileIsSelectedForUpload()
         {
             var result = controller.ImportAsync(null) as ViewResult;
-            Assert.AreEqual(IndexActionName, result.ViewName);
+            result.ForView(IndexActionName);
         }
 
         [Test]
@@ -49,7 +50,7 @@ namespace GiveCRM.Admin.Web.Tests
 
             var result = controller.ImportAsync(file) as ViewResult;
 
-            Assert.AreEqual(IndexActionName, result.ViewName);
+            result.ForView(IndexActionName);
         }
 
         [Test]
@@ -72,7 +73,7 @@ namespace GiveCRM.Admin.Web.Tests
 
             var result = controller.ImportAsync(file) as ViewResult;
 
-            Assert.AreEqual(IndexActionName, result.ViewName);
+            result.ForView(IndexActionName);
         }
 
         [Test]
@@ -96,7 +97,7 @@ namespace GiveCRM.Admin.Web.Tests
 
             var result = controller.ImportAsync(file);
 
-            Assert.IsNotInstanceOf<ViewResult>(result);
+            result.AssertActionRedirect();
         }
 
         [Test]
@@ -108,7 +109,7 @@ namespace GiveCRM.Admin.Web.Tests
 
             var result = controller.ImportAsync(file);
 
-            Assert.IsNotInstanceOf<ViewResult>(result);
+            result.AssertActionRedirect();
         }
 
         [Test]
