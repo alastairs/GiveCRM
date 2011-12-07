@@ -1,11 +1,9 @@
-using GiveCRM.BusinessLogic;
-
 [assembly: WebActivator.PreApplicationStartMethod(typeof(GiveCRM.Web.App_Start.NinjectMVC3), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(GiveCRM.Web.App_Start.NinjectMVC3), "Stop")]
 
 namespace GiveCRM.Web.App_Start
 {
-    using System.Reflection;
+    using GiveCRM.BusinessLogic;
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
     using Ninject;
     using Ninject.Extensions.Conventions;
