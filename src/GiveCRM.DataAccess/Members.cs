@@ -1,14 +1,27 @@
-﻿namespace GiveCRM.DataAccess
+﻿using Ninject.Extensions.Logging;
+
+namespace GiveCRM.DataAccess
 {
     using System;
     using System.Collections.Generic;
-	using GiveCRM.BusinessLogic;
+    using GiveCRM.BusinessLogic;
     using GiveCRM.Models;
     using Simple.Data;
 
     public class Members : IMemberRepository
     {
+        private readonly ILogger logger;
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
+
+        public Members(ILogger logger)
+        {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            this.logger = logger;
+        }
 
         public Member GetById(int id)
         {
@@ -136,8 +149,10 @@
                     transaction.Commit();
                     return inserted;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    logger.Error(ex, "An error occurred inserting new member {0} {1}", member.FirstName, member.LastName);
+
                     transaction.Rollback();
                     throw;
                 }
@@ -155,8 +170,10 @@
                     refetchPhoneNumbers = UpdatePhoneNumbers(member, transaction);
                     transaction.Commit();
                 }
-                catch
+                catch(Exception ex)
                 {
+                    logger.Error(ex, "An error occurred updating member {0} {1} (ID {2}", member.FirstName, member.LastName, member.Id);
+
                     transaction.Rollback();
                     throw;
                 }
