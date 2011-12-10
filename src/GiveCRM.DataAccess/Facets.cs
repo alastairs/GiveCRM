@@ -1,14 +1,27 @@
-﻿namespace GiveCRM.DataAccess
+﻿using Ninject.Extensions.Logging;
+
+namespace GiveCRM.DataAccess
 {
     using System;
     using System.Collections.Generic;
-	using GiveCRM.BusinessLogic;
+    using GiveCRM.BusinessLogic;
     using GiveCRM.Models;
     using Simple.Data;
 
     public class Facets : IFacetRepository
     {
+        private readonly ILogger logger;
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
+
+        public Facets(ILogger logger)
+        {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            this.logger = logger;
+        }
 
         public Facet GetById(int id)
         {
@@ -110,8 +123,10 @@
                     }
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    logger.Error(ex, "An error occurred updating facet {0} (ID: {1})", facet.Name, facet.Id);
+
                     transaction.Rollback();
                     throw;
                 }
@@ -133,8 +148,10 @@
                     transaction.Commit();
                     return inserted;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    logger.Error(ex, "An error occurred inserting new facet {0}", facet.Name);
+
                     transaction.Rollback();
                     throw;
                 }
