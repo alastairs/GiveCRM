@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Text;
 using GiveCRM.Models;
+using NSubstitute;
 using NUnit.Framework;
+using Ninject.Extensions.Logging;
 using Simple.Data;
 
 namespace GiveCRM.DataAccess.Test
@@ -10,6 +12,7 @@ namespace GiveCRM.DataAccess.Test
     public class CampaignsTest
     {
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
+        private readonly ILogger logger = Substitute.For<ILogger>();
 
         [SetUp]
         public void SetUp()
@@ -26,7 +29,7 @@ namespace GiveCRM.DataAccess.Test
         [Test]
         public void InsertCampaign()
         {
-            var campaigns = new Campaigns();
+            var campaigns = new Campaigns(logger);
             var campaign = new Campaign
                                {
                                    Name = "Test",
