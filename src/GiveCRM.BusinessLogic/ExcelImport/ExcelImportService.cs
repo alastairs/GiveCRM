@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using GiveCRM.ImportExport;
 using GiveCRM.Models;
+using Ninject.Extensions.Logging;
 
 namespace GiveCRM.BusinessLogic.ExcelImport
 {
@@ -12,8 +13,9 @@ namespace GiveCRM.BusinessLogic.ExcelImport
         private readonly IExcelImport importer;
         private readonly IMemberService memberService;
         private readonly IMemberFactory memberFactory;
+        private readonly ILogger logger;
 
-        public ExcelImportService(IExcelImport importer, IMemberService memberService, IMemberFactory memberFactory)
+        public ExcelImportService(IExcelImport importer, IMemberService memberService, IMemberFactory memberFactory, ILogger logger)
         {
             if (importer == null)
             {
@@ -30,9 +32,15 @@ namespace GiveCRM.BusinessLogic.ExcelImport
                 throw new ArgumentNullException("memberFactory");
             }
 
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
             this.importer = importer;
             this.memberService = memberService;
             this.memberFactory = memberFactory;
+            this.logger = logger;
         }
 
         public event Action<object, ImportDataCompletedEventArgs> ImportCompleted;
@@ -68,6 +76,8 @@ namespace GiveCRM.BusinessLogic.ExcelImport
             }
             catch (Exception ex)
             {
+                logger.Error(ex, "An error occurred whilst importing from Excel");
+                
                 // The only exception that is explicitly thrown by the underlying code is an InvalidOperationException.
                 // I would like to make this less catch-all, but there's probably a large number of exceptions that 
                 // could be thrown by the import code, none of which are declared in the code itself.
