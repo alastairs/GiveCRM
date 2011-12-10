@@ -7,15 +7,28 @@
     using GiveCRM.Models;
     using GiveCRM.DummyDataGenerator.Generation;
 
-    internal class Generator
+    using Ninject.Extensions.Logging;
+    
+    public class Generator : IGenerator
     {
+        private readonly ILogger logger;
         private const int UpdateFromLoopFrequency = 100;
 
         private Campaign campaign;
         private List<Member> members;
         public event Action<object, EventArgs<string>> Update;
 
-        internal void GenerateMembers(int countToGenerate)
+        public Generator(ILogger logger)
+        {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            this.logger = logger;
+        }
+
+        public void GenerateMembers(int countToGenerate)
         {
             OnUpdate("Generating members");
             DateTime startTime = DateTime.Now;
@@ -42,7 +55,7 @@
 
         private void SaveMembers(IList<Member> newMembers)
         {
-            Members membersDb = new Members();
+            Members membersDb = new Members(logger);
             for (int index = 0; index < newMembers.Count; index++)
             {
                 Member saved = membersDb.Insert(newMembers[index]);
@@ -56,12 +69,12 @@
             }
         }
 
-        internal void LoadMembers()
+        public void LoadMembers()
         {
             OnUpdate("Loading members");
             DateTime startTime = DateTime.Now;
 
-            Members membersDb = new Members();
+            Members membersDb = new Members(logger);
 
             members = new List<Member>(membersDb.GetAll());
 
@@ -72,20 +85,20 @@
 
         }
 
-        internal void GenerateCampaign()
+        public void GenerateCampaign()
         {
             OnUpdate("Generating campaign");
             CampaignGenerator generator = new CampaignGenerator();
             campaign = generator.Generate();
 
-            Campaigns campaignDb = new Campaigns();
+            Campaigns campaignDb = new Campaigns(logger);
             campaign = campaignDb.Insert(campaign);
 
             string finalMessage = "Generated campaign " + campaign;
             OnUpdate(finalMessage);
         }
 
-        internal void GenerateDonations(int minAmount, int maxAmount, int donationCountMax)
+        public void GenerateDonations(int minAmount, int maxAmount, int donationCountMax)
         {
             if ((members == null) || (members.Count == 0))
             {

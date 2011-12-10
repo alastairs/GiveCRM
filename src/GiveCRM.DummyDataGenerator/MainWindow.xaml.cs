@@ -8,12 +8,19 @@
     /// <summary>
     /// Interaction logic for Main.xaml
     /// </summary>
-    public partial class Main : Window
+    public partial class Main
     {
-        private readonly Generator generator = new Generator();
+        private readonly IGenerator generator;
 
-        public Main()
+        public Main(IGenerator generator)
         {
+            if (generator == null)
+            {
+                throw new ArgumentNullException("generator");
+            }
+            
+            this.generator = generator;
+            
             InitializeComponent();
             ShowDataseConnection();
 
