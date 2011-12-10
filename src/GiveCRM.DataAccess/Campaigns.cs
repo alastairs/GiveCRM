@@ -1,15 +1,28 @@
-﻿namespace GiveCRM.DataAccess
+﻿using Ninject.Extensions.Logging;
+
+namespace GiveCRM.DataAccess
 {
-	using System;
+    using System;
     using System.Collections.Generic;
-	using System.Linq;
-	using GiveCRM.BusinessLogic;
+    using System.Linq;
+    using GiveCRM.BusinessLogic;
     using GiveCRM.Models;
     using Simple.Data;
 
     public class Campaigns : ICampaignRepository
     {
+        private readonly ILogger logger;
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
+
+        public Campaigns(ILogger logger)
+        {
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
+            this.logger = logger;
+        }
 
         public Campaign GetById(int id)
         {
@@ -62,8 +75,9 @@
                     transaction.CampaignRuns.Insert(results);
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    logger.Error(ex, "An error occurred committing the campaign with ID {0}", campaignId);
                     transaction.Rollback();
                     throw;
                 }
