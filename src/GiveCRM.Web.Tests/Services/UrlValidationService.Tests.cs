@@ -7,13 +7,15 @@ using GiveCRM.Web.Services;
 using NSubstitute;
 using NUnit.Framework;
 using System.Web.Routing;
+using Ninject.Extensions.Logging;
 
 namespace GiveCRM.Web.Tests.Services
 {
     [TestFixture]
-    public class UrlValidationServiceTest:AssertionHelper
+    public class UrlValidationServiceTest : AssertionHelper
     {
-        
+        private readonly ILogger logger = Substitute.For<ILogger>();
+
         private UrlValidationService CreateService()
         {
             var rules = new List<IAmAUrlValidationRule>
@@ -30,39 +32,10 @@ namespace GiveCRM.Web.Tests.Services
         [Test]
         public void ShouldReturnTrueForValidUrl()
         {
-            var routes = new RouteCollection(); 
+            var routes = new RouteCollection();
             MvcApplication.RegisterRoutes(routes);
 
             var request = Substitute.For<HttpRequestBase>();
-
-                
-            request.ApplicationPath.Returns("/"); 
-            request.Url.Returns(new Uri("http://localhost/Home", UriKind.Absolute)); 
-            request.ServerVariables.Returns(new System.Collections.Specialized.NameValueCollection());
-
-            var response = Substitute.For<HttpResponseBase>();
-                
-            response.ApplyAppPathModifier("/Home").Returns("http://localhost/Home"); 
- 
-            var context = Substitute.For<HttpContextBase>(); 
-            context.Request.Returns(request); 
-            context.Response.Returns(response); 
- 
-            var controller = new AccountController(null,null,null);
-            controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
-            controller.Url = new UrlHelper(new RequestContext(context, new RouteData()), routes);
-            
-            var service = CreateService();
-            var result = service.IsRedirectable(controller, @"/Home");
-            Expect(result, Is.True);
-        }
-
-        [Test]
-        public void ShouldReturnFalseForEmptyStringUrl()
-        {
-            var routes = new RouteCollection();
-            MvcApplication.RegisterRoutes(routes);
-var request = Substitute.For<HttpRequestBase>();
 
 
             request.ApplicationPath.Returns("/");
@@ -75,9 +48,38 @@ var request = Substitute.For<HttpRequestBase>();
 
             var context = Substitute.For<HttpContextBase>();
             context.Request.Returns(request);
-            context.Response.Returns(response); 
+            context.Response.Returns(response);
 
-            var controller = new AccountController(null, null, null);
+            var controller = new AccountController(null, null, null, logger);
+            controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
+            controller.Url = new UrlHelper(new RequestContext(context, new RouteData()), routes);
+
+            var service = CreateService();
+            var result = service.IsRedirectable(controller, @"/Home");
+            Expect(result, Is.True);
+        }
+
+        [Test]
+        public void ShouldReturnFalseForEmptyStringUrl()
+        {
+            var routes = new RouteCollection();
+            MvcApplication.RegisterRoutes(routes);
+            var request = Substitute.For<HttpRequestBase>();
+
+
+            request.ApplicationPath.Returns("/");
+            request.Url.Returns(new Uri("http://localhost/Home", UriKind.Absolute));
+            request.ServerVariables.Returns(new System.Collections.Specialized.NameValueCollection());
+
+            var response = Substitute.For<HttpResponseBase>();
+
+            response.ApplyAppPathModifier("/Home").Returns("http://localhost/Home");
+
+            var context = Substitute.For<HttpContextBase>();
+            context.Request.Returns(request);
+            context.Response.Returns(response);
+
+            var controller = new AccountController(null, null, null, logger);
             controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
             controller.Url = new UrlHelper(new RequestContext(context, new RouteData()), routes);
 
@@ -91,7 +93,7 @@ var request = Substitute.For<HttpRequestBase>();
         {
             var routes = new RouteCollection();
             MvcApplication.RegisterRoutes(routes);
-var request = Substitute.For<HttpRequestBase>();
+            var request = Substitute.For<HttpRequestBase>();
 
 
             request.ApplicationPath.Returns("/");
@@ -104,9 +106,9 @@ var request = Substitute.For<HttpRequestBase>();
 
             var context = Substitute.For<HttpContextBase>();
             context.Request.Returns(request);
-            context.Response.Returns(response); 
+            context.Response.Returns(response);
 
-            var controller = new AccountController(null, null, null);
+            var controller = new AccountController(null, null, null, logger);
             controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
             controller.Url = new UrlHelper(new RequestContext(context, new RouteData()), routes);
 
@@ -121,8 +123,7 @@ var request = Substitute.For<HttpRequestBase>();
             var routes = new RouteCollection();
             MvcApplication.RegisterRoutes(routes);
 
-var request = Substitute.For<HttpRequestBase>();
-
+            var request = Substitute.For<HttpRequestBase>();
 
             request.ApplicationPath.Returns("/");
             request.Url.Returns(new Uri("http://localhost/Home", UriKind.Absolute));
@@ -134,8 +135,8 @@ var request = Substitute.For<HttpRequestBase>();
 
             var context = Substitute.For<HttpContextBase>();
             context.Request.Returns(request);
-            context.Response.Returns(response); 
-            var controller = new AccountController(null, null, null);
+            context.Response.Returns(response);
+            var controller = new AccountController(null, null, null, logger);
             controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
             controller.Url = new UrlHelper(new RequestContext(context, new RouteData()), routes);
 
