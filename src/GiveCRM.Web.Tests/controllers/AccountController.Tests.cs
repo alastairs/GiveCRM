@@ -5,6 +5,7 @@ using GiveCRM.Web.Services;
 using MvcContrib.TestHelper;
 using NSubstitute;
 using NUnit.Framework;
+using Ninject.Extensions.Logging;
 
 namespace GiveCRM.Web.Tests.controllers
 {
@@ -14,6 +15,7 @@ namespace GiveCRM.Web.Tests.controllers
         private IMembershipService membershipService;
         private IAuthenticationService authenticationService;
         private IUrlValidationService urlValidationService;
+        private ILogger logger;
 
         [SetUp]
         public void SetUp()
@@ -21,13 +23,15 @@ namespace GiveCRM.Web.Tests.controllers
             membershipService = Substitute.For<IMembershipService>();
             authenticationService = Substitute.For<IAuthenticationService>();
             urlValidationService = Substitute.For<IUrlValidationService>();
+            logger = Substitute.For<ILogger>();
         }
 
         private AccountController CreateController()
         {
             return new AccountController(membershipService,
                 authenticationService,
-                urlValidationService);
+                urlValidationService,
+                logger);
         }
 
         [Test]
