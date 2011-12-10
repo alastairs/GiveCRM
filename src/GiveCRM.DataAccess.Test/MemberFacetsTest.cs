@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using GiveCRM.Models;
+using NSubstitute;
 using NUnit.Framework;
+using Ninject.Extensions.Logging;
 using Simple.Data;
 
 namespace GiveCRM.DataAccess.Test
@@ -10,7 +12,7 @@ namespace GiveCRM.DataAccess.Test
     public class MemberFacetsTest
     {
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
-
+        
         [SetUp]
         public void SetUp()
         {
@@ -116,7 +118,7 @@ namespace GiveCRM.DataAccess.Test
                                  Salutation = "Bob",
                                  EmailAddress = "bob@hotmail.com"
                              };
-            member = new Members().Insert(member);
+            member = new Members(Substitute.For<ILogger>()).Insert(member);
             return member;
         }
     }
