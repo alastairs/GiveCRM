@@ -5,6 +5,7 @@ using GiveCRM.BusinessLogic.ExcelImport;
 using GiveCRM.ImportExport;
 using NSubstitute;
 using NUnit.Framework;
+using Ninject.Extensions.Logging;
 
 namespace GiveCRM.BusinessLogic.Tests
 {
@@ -69,8 +70,9 @@ namespace GiveCRM.BusinessLogic.Tests
         {
             var memberService = Substitute.For<IMemberService>();
             var memberFactory = Substitute.For<IMemberFactory>();
+            var logger = Substitute.For<ILogger>();
 
-            var importService = new ExcelImportService(excelImporter, memberService, memberFactory);
+            var importService = new ExcelImportService(excelImporter, memberService, memberFactory, logger);
             return importService;
         }
     }
