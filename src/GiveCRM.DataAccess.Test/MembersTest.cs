@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GiveCRM.Models;
+using NSubstitute;
 using NUnit.Framework;
+using Ninject.Extensions.Logging;
 using Simple.Data;
 
 namespace GiveCRM.DataAccess.Test
@@ -10,6 +12,9 @@ namespace GiveCRM.DataAccess.Test
     [TestFixture]
     public class MembersTest
     {
+        private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
+        private readonly ILogger logger = Substitute.For<ILogger>();
+
         [SetUp]
         public void SetUp()
         {
@@ -21,8 +26,6 @@ namespace GiveCRM.DataAccess.Test
             db.MemberFacets.DeleteAll();
             db.Members.DeleteAll();
         }
-
-        private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
 
         private static Member CreateAliceWithPhoneNumber()
         {
@@ -61,7 +64,7 @@ namespace GiveCRM.DataAccess.Test
         [Test]
         public void Get()
         {
-            var members = new Members();
+            var members = new Members(logger);
             Member member = CreateAliceWithPhoneNumber();
             member = members.Insert(member);
 
@@ -89,7 +92,7 @@ namespace GiveCRM.DataAccess.Test
         [Test]
         public void All()
         {
-            var members = new Members();
+            var members = new Members(logger);
             Member member = CreateAliceWithPhoneNumber();
             member = members.Insert(member);
             var donations = new Donations();
@@ -125,7 +128,7 @@ namespace GiveCRM.DataAccess.Test
         [Test]
         public void InsertMember()
         {
-            var members = new Members();
+            var members = new Members(logger);
             Member member = CreateAlice();
             member = members.Insert(member);
             Assert.AreNotEqual(0, member.Id);
@@ -134,7 +137,7 @@ namespace GiveCRM.DataAccess.Test
         [Test]
         public void InsertMemberWithPhoneNumber()
         {
-            var members = new Members();
+            var members = new Members(logger);
             Member member = CreateAliceWithPhoneNumber();
             member = members.Insert(member);
             Assert.AreNotEqual(0, member.Id);
