@@ -1,8 +1,9 @@
-﻿namespace GiveCRM.Web.Controllers
+﻿using Ninject.Extensions.Logging;
+
+namespace GiveCRM.Web.Controllers
 {
     using System;
     using System.Web.Mvc;
-
     using GiveCRM.BusinessLogic;
     using GiveCRM.Web.Models;
     using GiveCRM.Web.Services;
@@ -12,12 +13,35 @@
         private readonly IMembershipService membershipService;
         private readonly IAuthenticationService authenticationService;
         private readonly IUrlValidationService urlValidationService;
+        private readonly ILogger logger;
 
-        public AccountController(IMembershipService membershipService, IAuthenticationService authenticationService, IUrlValidationService urlValidationService)
+        public AccountController(IMembershipService membershipService, IAuthenticationService authenticationService,
+                                 IUrlValidationService urlValidationService, ILogger logger)
         {
+            if (membershipService == null)
+            {
+                throw new ArgumentNullException("membershipService");
+            }
+
+            if (authenticationService == null)
+            {
+                throw new ArgumentNullException("authenticationService");
+            }
+            
+            if (urlValidationService == null)
+            {
+                throw new ArgumentNullException("urlValidationService");
+            }
+            
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
             this.membershipService = membershipService;
             this.authenticationService = authenticationService;
             this.urlValidationService = urlValidationService;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -35,12 +59,12 @@
                 if (this.membershipService.ValidateUser(model.UserName, model.Password))
                 {
                     this.authenticationService.SetAuthorizationCredentials(model.UserName, model.RememberMe);
-                    
+
                     if (this.urlValidationService.IsRedirectable(this, returnUrl))
                     {
                         return Redirect(returnUrl);
                     }
-                    
+
                     return this.RedirectToAction("Index", "Home");
                 }
 
@@ -71,14 +95,13 @@
             if (ModelState.IsValid)
             {
                 string error;
-                if (membershipService.CreateUser(model.UserName, model.Password,model.Email, out error))
+                if (membershipService.CreateUser(model.UserName, model.Password, model.Email, out error))
                 {
                     authenticationService.SetAuthorizationCredentials(model.UserName, false);
                     return RedirectToAction("Index", "Home");
                 }
-                
+
                 ModelState.AddModelError(string.Empty, error);
-                
             }
 
             // If we got this far, something failed, redisplay form
@@ -100,7 +123,6 @@
         {
             if (ModelState.IsValid)
             {
-
                 // ChangePassword will throw an exception rather
                 // than return false in certain failure scenarios.
                 bool changePasswordSucceeded;
@@ -109,8 +131,10 @@
                     string username = User == null ? string.Empty : User.Identity.Name;
                     changePasswordSucceeded = this.membershipService.ChangePassword(username, model.OldPassword, model.NewPassword);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    logger.Error(ex, "An error occurred whilst changing the password for user {0}", User.Identity.Name);
+
                     changePasswordSucceeded = false;
                 }
 
