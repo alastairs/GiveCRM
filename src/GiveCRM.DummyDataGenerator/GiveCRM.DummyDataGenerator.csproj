@@ -111,6 +111,7 @@
     <Compile Include="Generation\ICampaignGenerator.cs" />
     <Compile Include="Generation\ICampaignRunGenerator.cs" />
     <Compile Include="Generation\IDatabaseGenerator.cs" />
+    <Compile Include="Generation\IDonationGenerator.cs" />
     <Compile Include="Generation\IMemberGenerator.cs" />
     <Compile Include="Generation\IMemberSearchFilterGenerator.cs" />
     <Compile Include="Generation\MemberSearchFilterGenerator.cs" />

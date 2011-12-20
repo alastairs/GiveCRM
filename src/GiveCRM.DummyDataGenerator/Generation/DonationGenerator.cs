@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using GiveCRM.BusinessLogic;
 using GiveCRM.Models;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
-    internal class DonationGenerator
+    public sealed class DonationGenerator : IDonationGenerator
     {
         private readonly RandomSource random = new RandomSource();
         private readonly Action<string> logAction;
-        private readonly IEnumerable<Campaign> campaigns;
+        private readonly ICampaignRepository campaignRepository;
         private readonly IMemberRepository memberRepository;
         private readonly IDonationRepository donationRepository;
         private readonly int donationRate;
 
-        public DonationGenerator(Action<string> logAction, IEnumerable<Campaign> campaigns, IMemberRepository memberRepository, IDonationRepository donationRepository) 
+        public DonationGenerator(Action<string> logAction, ICampaignRepository campaignRepository, IMemberRepository memberRepository, IDonationRepository donationRepository) 
         {
             if (memberRepository == null)
             {
@@ -28,7 +27,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
             }
 
             this.logAction = logAction;
-            this.campaigns = campaigns;
+            this.campaignRepository = campaignRepository;
             this.memberRepository = memberRepository;
             this.donationRepository = donationRepository;
 
@@ -36,13 +35,13 @@ namespace GiveCRM.DummyDataGenerator.Generation
             donationRate = 33 + random.NextInt(33);
         }
 
-        internal void Generate()
+        public void Generate()
         {
             logAction("Generating donations...");
             //TODO: output percentage completion like the other generators
 
             // only want to generate donations for committed campaigns
-            var committedCampaigns = campaigns.Where(c => c.IsCommitted).ToList();
+            var committedCampaigns = this.campaignRepository.GetAll().Where(c => c.IsCommitted).ToList();
             
             foreach (var campaign in committedCampaigns)
             {

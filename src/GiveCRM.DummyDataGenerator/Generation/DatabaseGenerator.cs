@@ -11,8 +11,9 @@ namespace GiveCRM.DummyDataGenerator.Generation
         private readonly Action<string> logAction;
         private readonly IMemberGenerator memberGenerator;
         private readonly ICampaignGenerator campaignGenerator;
+        private readonly IDonationGenerator donationGenerator;
 
-        public DatabaseGenerator(Action<string> logAction, IMemberGenerator memberGenerator, ICampaignGenerator campaignGenerator)
+        public DatabaseGenerator(Action<string> logAction, IMemberGenerator memberGenerator, ICampaignGenerator campaignGenerator, IDonationGenerator donationGenerator)
         {
             if (memberGenerator == null)
             {
@@ -27,6 +28,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
             this.logAction = logAction;
             this.memberGenerator = memberGenerator;
             this.campaignGenerator = campaignGenerator;
+            this.donationGenerator = donationGenerator;
         }
 
         public void Generate()
@@ -65,9 +67,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
 
         private void GenerateDonations()
         {
-            var campaigns = db.Campaigns.All().Cast<Campaign>();
-            // TODO
-            //new DonationGenerator(logAction, campaigns).Generate();
+            donationGenerator.Generate();
         }
 
         private void Generate(IBaseGenerator generator, int minNumber, int maxNumber)
