@@ -1,16 +1,20 @@
 ﻿using System.Linq;
 using Simple.Data;
 using GiveCRM.BusinessLogic;
-using GiveCRM.DataAccess;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
-    internal class CampaignRunGenerator
+    public sealed class CampaignRunGenerator : ICampaignRunGenerator
     {
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
-        private readonly MemberService memberService = new MemberService(new Members(), new MemberSearchFilters(), new SearchQueryService());
+        private readonly IMemberService memberService;
 
-        internal void GenerateCampaignRun(int campaignId)
+        internal CampaignRunGenerator(IMemberService memberService)
+        {
+            this.memberService = memberService;
+        }
+
+        public void GenerateCampaignRun(int campaignId)
         {
             var campaignMembers = this.memberService.SearchByCampaignId(campaignId);
             var memberCampaignMemberships = campaignMembers.Select(member => new {CampaignId = campaignId, MemberId = member.Id}).ToList();

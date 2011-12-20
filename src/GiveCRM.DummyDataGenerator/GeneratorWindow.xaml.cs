@@ -11,10 +11,33 @@ namespace GiveCRM.DummyDataGenerator
 {
     public partial class GeneratorWindow
     {
+        private readonly IDatabaseGenerator databaseGenerator;
+        private readonly IMemberGenerator memberGenerator;
+        private readonly ICampaignGenerator campaignGenerator;
+
         private volatile dynamic db;
 
-        public GeneratorWindow()
+        internal GeneratorWindow(IDatabaseGenerator databaseGenerator, IMemberGenerator memberGenerator, ICampaignGenerator campaignGenerator)
         {
+            if (databaseGenerator == null)
+            {
+                throw new ArgumentNullException("databaseGenerator");
+            }
+
+            if (memberGenerator == null)
+            {
+                throw new ArgumentNullException("memberGenerator");
+            }
+
+            if (campaignGenerator == null)
+            {
+                throw new ArgumentNullException("campaignGenerator");
+            }
+
+            this.databaseGenerator = databaseGenerator;
+            this.memberGenerator = memberGenerator;
+            this.campaignGenerator = campaignGenerator;
+
             InitializeComponent();
 
             var connectionStringSetting = ConfigurationManager.ConnectionStrings["GiveCRM"];
@@ -64,21 +87,20 @@ namespace GiveCRM.DummyDataGenerator
         private void GenerateMembersButton_Click(object sender, RoutedEventArgs e)
         {
             int numberOfMembersToGenerate = Convert.ToInt32(NumberOfMembersTextBox.Text);
-            var generator = new MemberGenerator(Log);
-            RunGeneration(() => generator.Generate(numberOfMembersToGenerate));
+            
+            RunGeneration(() => memberGenerator.Generate(numberOfMembersToGenerate));
         }
         
         private void GenerateCampaignsButton_Click(object sender, RoutedEventArgs e)
         {
             int numberOfCampaignsToGenerate = Convert.ToInt32(NumberOfCampaignsTextBox.Text);
-            var generator = new CampaignGenerator(Log);
-            RunGeneration(() => generator.Generate(numberOfCampaignsToGenerate));
+            
+            RunGeneration(() => campaignGenerator.Generate(numberOfCampaignsToGenerate));
         }
 
         private void GenerateAllButton_Click(object sender, RoutedEventArgs e)
         {
-            var generator = new DatabaseGenerator(Log);
-            RunGeneration(generator.Generate);
+            RunGeneration(databaseGenerator.Generate);
         }
 
         private void RunGeneration(Action generationCallback)

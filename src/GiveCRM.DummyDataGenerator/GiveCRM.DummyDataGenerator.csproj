@@ -43,6 +43,12 @@
     <StartupObject>GiveCRM.DummyDataGenerator.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ninject">
+      <HintPath>..\packages\Ninject.2.2.1.4\lib\net40-Client\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Conventions">
+      <HintPath>..\packages\Ninject.Extensions.Conventions.2.2.0.5\lib\net40-Full\Ninject.Extensions.Conventions.dll</HintPath>
+    </Reference>
     <Reference Include="Simple.Data, Version=0.12.2.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Simple.Data.Core.0.12.2.1\lib\net40\Simple.Data.dll</HintPath>
@@ -95,6 +101,12 @@
     <Compile Include="Generation\DonationGenerator.cs" />
     <Compile Include="Generation\EmailAddressGenerator.cs" />
     <Compile Include="Generation\BaseGenerator.cs" />
+    <Compile Include="Generation\IBaseGenerator.cs" />
+    <Compile Include="Generation\ICampaignGenerator.cs" />
+    <Compile Include="Generation\ICampaignRunGenerator.cs" />
+    <Compile Include="Generation\IDatabaseGenerator.cs" />
+    <Compile Include="Generation\IMemberGenerator.cs" />
+    <Compile Include="Generation\IMemberSearchFilterGenerator.cs" />
     <Compile Include="Generation\MemberSearchFilterGenerator.cs" />
     <Compile Include="Generation\MemberGenerator.cs" />
     <Compile Include="Generation\ProgressReporter.cs" />
@@ -122,10 +134,6 @@
       <Project>{03CBFC3C-70A7-4345-BA77-8A121ACC445E}</Project>
       <Name>GiveCRM.BusinessLogic</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GiveCRM.DataAccess\GiveCRM.DataAccess.csproj">
-      <Project>{BAB645DD-6283-4C15-BF97-8700A01FC526}</Project>
-      <Name>GiveCRM.DataAccess</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GiveCRM.Models\GiveCRM.Models.csproj">
       <Project>{EF13BB24-17A9-4A39-BB5C-9A3B36519CB1}</Project>
       <Name>GiveCRM.Models</Name>
@@ -146,7 +154,13 @@
   <Target Name="BeforeBuild">
     <Exec Command="&quot;$(SolutionDir)Tools\NuGet&quot; install &quot;$(ProjectDir)packages.config&quot; -o 			&quot;$(SolutionDir)packages&quot;" />
   </Target>
-  <!-- <Target Name="AfterBuild">
+  <Target Name="AfterBuild">
+    <PropertyGroup>
+      <GiveCRMDataAccessOutputPath>$(ProjectDir)..\GiveCRM.DataAccess\bin\$(Configuration)\</GiveCRMDataAccessOutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <GiveCRMDataAccessBinaries Include="$(GiveCRMDataAccessOutputPath)*.dll;$(GiveCRMDataAccessOutputPath)*.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GiveCRMDataAccessBinaries)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
   </Target>
-  -->
 </Project>

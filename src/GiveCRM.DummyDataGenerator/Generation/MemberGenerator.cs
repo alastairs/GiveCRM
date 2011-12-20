@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using GiveCRM.DataAccess;
+using GiveCRM.BusinessLogic;
 using GiveCRM.DummyDataGenerator.Data;
 using GiveCRM.Models;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
-    internal class MemberGenerator : BaseGenerator
+    public class MemberGenerator : BaseGenerator, IMemberGenerator
     {
         internal override string GeneratedItemType{get {return "members";}}
 
@@ -14,19 +14,26 @@ namespace GiveCRM.DummyDataGenerator.Generation
         private readonly TitleGenerator titleGenerator = new TitleGenerator();
         private readonly EmailAddressGenerator emailGenerator = new EmailAddressGenerator();
         private readonly AddressGenerator addressGenerator = new AddressGenerator();
+        private readonly IRepository<Member> memberRepository;
 
         private int lastReferenceNumber;
 
-        internal MemberGenerator(Action<string> logAction) : base(logAction)
-        {}
-
-        internal override void Generate(int numberToGenerate)
+        public MemberGenerator(Action<string> logAction, IRepository<Member> memberRepository) : base(logAction)
         {
-            Members membersDb = new Members();
+            if (memberRepository == null)
+            {
+                throw new ArgumentNullException("memberRepository");
+            }
+
+            this.memberRepository = memberRepository;
+        }
+
+        public override void Generate(int numberToGenerate)
+        {
             GenerateMultiple(numberToGenerate, () =>
                                                    {
                                                        var member = GenerateMember();
-                                                       membersDb.Insert(member);
+                                                       memberRepository.Insert(member);
                                                    });
         }
 
