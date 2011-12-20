@@ -43,11 +43,17 @@
     <StartupObject>GiveCRM.DummyDataGenerator.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\GiveCRM.Web\Bin\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Ninject">
       <HintPath>..\packages\Ninject.2.2.1.4\lib\net40-Client\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="Ninject.Extensions.Conventions">
       <HintPath>..\packages\Ninject.Extensions.Conventions.2.2.0.5\lib\net40-Full\Ninject.Extensions.Conventions.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Logging, Version=2.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Logging.2.2.0.4\lib\net40-Client\Ninject.Extensions.Logging.dll</HintPath>
     </Reference>
     <Reference Include="Simple.Data, Version=0.12.2.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
