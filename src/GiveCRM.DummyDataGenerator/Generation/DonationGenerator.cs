@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using GiveCRM.DataAccess;
-using GiveCRM.Models;
 using System.Linq;
+using GiveCRM.BusinessLogic;
+using GiveCRM.Models;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
@@ -11,12 +11,26 @@ namespace GiveCRM.DummyDataGenerator.Generation
         private readonly RandomSource random = new RandomSource();
         private readonly Action<string> logAction;
         private readonly IEnumerable<Campaign> campaigns;
+        private readonly IMemberRepository memberRepository;
+        private readonly IDonationRepository donationRepository;
         private readonly int donationRate;
 
-        public DonationGenerator(Action<string> logAction, IEnumerable<Campaign> campaigns) 
+        public DonationGenerator(Action<string> logAction, IEnumerable<Campaign> campaigns, IMemberRepository memberRepository, IDonationRepository donationRepository) 
         {
+            if (memberRepository == null)
+            {
+                throw new ArgumentNullException("memberRepository");
+            }
+
+            if (donationRepository == null)
+            {
+                throw new ArgumentNullException("donationRepository");
+            }
+
             this.logAction = logAction;
             this.campaigns = campaigns;
+            this.memberRepository = memberRepository;
+            this.donationRepository = donationRepository;
 
             // donation rate is set somewhere between 1/3 and 2/3
             donationRate = 33 + random.NextInt(33);
@@ -29,23 +43,21 @@ namespace GiveCRM.DummyDataGenerator.Generation
 
             // only want to generate donations for committed campaigns
             var committedCampaigns = campaigns.Where(c => c.IsCommitted).ToList();
-            var members = new Members();
-            var donations = new Donations();
-
+            
             foreach (var campaign in committedCampaigns)
             {
-                var membersForCampaign = members.GetByCampaignId(campaign.Id);
+                var membersForCampaign = memberRepository.GetByCampaignId(campaign.Id);
 
                 foreach (var member in membersForCampaign)
                 {
-                    GenerateCampaignDonationsForMember(donations, campaign, member);
+                    GenerateCampaignDonationsForMember(campaign, member);
                 }
             }
 
             logAction("Donations generated successfully");
         }
 
-        private void GenerateCampaignDonationsForMember(Donations donationsRepo, Campaign campaign, Member member)
+        private void GenerateCampaignDonationsForMember(Campaign campaign, Member member)
         {
             int numberOfDonations = random.NextInt(0, 3);
 
@@ -62,7 +74,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
                                             Amount = amount, 
                                             Date = random.NextDateTime(),
                                        };
-                    donationsRepo.Insert(donation);
+                    donationRepository.Insert(donation);
                 }
             }
         }

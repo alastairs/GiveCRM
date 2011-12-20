@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GiveCRM.BusinessLogic;
-using GiveCRM.DataAccess;
 using GiveCRM.DummyDataGenerator.Data;
 using GiveCRM.Models;
 using GiveCRM.Models.Search;
@@ -10,16 +9,27 @@ using GiveCRM.Web.Models.Search;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
-    internal class MemberSearchFilterGenerator
+    public sealed class MemberSearchFilterGenerator : IMemberSearchFilterGenerator
     {
+        private readonly ISearchService searchService;
+        private readonly IRepository<MemberSearchFilter> memberSearchFilterRepository;
         private readonly RandomSource random = new RandomSource();
-        private readonly MemberSearchFilters searchFilters = new MemberSearchFilters();
-        private readonly SearchService searchRepo = new SearchService(new Facets());
-
         private readonly Dictionary<SearchFieldType, IList<SearchOperator>> fieldTypeToOperatorMap;
 
-        public MemberSearchFilterGenerator()
+        public MemberSearchFilterGenerator(ISearchService searchService, IRepository<MemberSearchFilter> memberSearchFilterRepository)
         {
+            if (searchService == null)
+            {
+                throw new ArgumentNullException("searchService");
+            }
+
+            if (memberSearchFilterRepository == null)
+            {
+                throw new ArgumentNullException("memberSearchFilterRepository");
+            }
+
+            this.searchService = searchService;
+            this.memberSearchFilterRepository = memberSearchFilterRepository;
             fieldTypeToOperatorMap = new Dictionary<SearchFieldType, IList<SearchOperator>>();
 
             var allTypesHave = new[]
@@ -49,9 +59,9 @@ namespace GiveCRM.DummyDataGenerator.Generation
             fieldTypeToOperatorMap.Add(SearchFieldType.SelectList, allTypesHave);
         }
 
-        internal void GenerateMemberSearchFilters(int campaignId)
+        public void GenerateMemberSearchFilters(int campaignId)
         {
-            var emptySearchCriteria = searchRepo.GetEmptySearchCriteria().ToList();
+            var emptySearchCriteria = searchService.GetEmptySearchCriteria().ToList();
 
             for (int i = 0; i < random.NextInt(1, 3); i++)
             {
@@ -69,7 +79,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
                                                    Value = criterionInfo.Value
                                        };
 
-                searchFilters.Insert(searchFilter);
+                memberSearchFilterRepository.Insert(searchFilter);
             }
         }
 

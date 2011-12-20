@@ -1,28 +1,47 @@
 using System;
-using GiveCRM.DataAccess;
+using GiveCRM.BusinessLogic;
 using GiveCRM.Models;
 using GiveCRM.DummyDataGenerator.Data;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
-    internal class CampaignGenerator : BaseGenerator
+    public sealed class CampaignGenerator : BaseGenerator, ICampaignGenerator
     {
+        private readonly IRepository<Campaign> campaignRepository;
         internal override string GeneratedItemType{get {return "campaigns";}}
 
         private readonly RandomSource random = new RandomSource();
-        private readonly MemberSearchFilterGenerator memberSearchFilterGenerator = new MemberSearchFilterGenerator();
-        private readonly CampaignRunGenerator campaignRunGenerator = new CampaignRunGenerator();
+        private readonly IMemberSearchFilterGenerator memberSearchFilterGenerator;
+        private readonly ICampaignRunGenerator campaignRunGenerator;
 
-        public CampaignGenerator(Action<string> logAction) : base(logAction)
-        {}
-
-        internal override void Generate(int numberToGenerate)
+        public CampaignGenerator(Action<string> logAction, IRepository<Campaign> campaignRepository, IMemberSearchFilterGenerator memberSearchFilterGenerator, ICampaignRunGenerator campaignRunGenerator) : base(logAction)
         {
-            Campaigns campaigns = new Campaigns();
+            if (campaignRepository == null)
+            {
+                throw new ArgumentNullException("campaignRepository");
+            }
+
+            if (memberSearchFilterGenerator == null)
+            {
+                throw new ArgumentNullException("memberSearchFilterGenerator");
+            }
+
+            if (campaignRunGenerator == null)
+            {
+                throw new ArgumentNullException("campaignRunGenerator");
+            }
+
+            this.campaignRepository = campaignRepository;
+            this.memberSearchFilterGenerator = memberSearchFilterGenerator;
+            this.campaignRunGenerator = campaignRunGenerator;
+        }
+
+        public override void Generate(int numberToGenerate)
+        {
             GenerateMultiple(numberToGenerate, () =>
                                                    {
                                                        var campaign = GenerateCampaign();
-                                                       campaign = campaigns.Insert(campaign);
+                                                       campaign = campaignRepository.Insert(campaign);
                                                        memberSearchFilterGenerator.GenerateMemberSearchFilters(campaign.Id);
 
                                                        if (campaign.IsCommitted)
