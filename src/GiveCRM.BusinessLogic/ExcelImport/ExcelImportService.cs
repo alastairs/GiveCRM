@@ -8,7 +8,7 @@ using Ninject.Extensions.Logging;
 
 namespace GiveCRM.BusinessLogic.ExcelImport
 {
-    internal class ExcelImportService : IExcelImportService
+    public class ExcelImportService : IExcelImportService
     {
         private readonly IExcelImport importer;
         private readonly IMemberService memberService;
