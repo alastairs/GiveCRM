@@ -9,7 +9,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
         private readonly IMemberService memberService;
 
-        internal CampaignRunGenerator(IMemberService memberService)
+        public CampaignRunGenerator(IMemberService memberService)
         {
             this.memberService = memberService;
         }
