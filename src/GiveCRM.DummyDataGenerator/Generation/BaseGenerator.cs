@@ -5,9 +5,8 @@ namespace GiveCRM.DummyDataGenerator.Generation
     public abstract class BaseGenerator : IBaseGenerator
     {
         internal abstract string GeneratedItemType{get;}
-        public abstract void Generate(int numberToGenerate);
-
         protected readonly Action<string> LogAction;
+        public abstract void Generate(int numberToGenerate);
 
         protected BaseGenerator(Action<string> logAction)
         {

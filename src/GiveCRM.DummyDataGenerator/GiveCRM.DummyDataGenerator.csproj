@@ -123,6 +123,9 @@
     <Compile Include="GeneratorWindow.xaml.cs">
       <DependentUpon>GeneratorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Logging\LoggingModule.cs" />
+    <Compile Include="Logging\UILogger.cs" />
+    <Compile Include="Logging\WpfControlLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

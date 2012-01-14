@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("GiveCRM DummyDataGenerator")]
+[assembly: AssemblyTitle("GiveCRM Dummy Data Generator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("GiveCRM")]

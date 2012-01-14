@@ -87,14 +87,12 @@ namespace GiveCRM.DummyDataGenerator
         private void GenerateMembersButton_Click(object sender, RoutedEventArgs e)
         {
             int numberOfMembersToGenerate = Convert.ToInt32(NumberOfMembersTextBox.Text);
-            
             RunGeneration(() => memberGenerator.Generate(numberOfMembersToGenerate));
         }
         
         private void GenerateCampaignsButton_Click(object sender, RoutedEventArgs e)
         {
             int numberOfCampaignsToGenerate = Convert.ToInt32(NumberOfCampaignsTextBox.Text);
-            
             RunGeneration(() => campaignGenerator.Generate(numberOfCampaignsToGenerate));
         }
 
@@ -137,7 +135,7 @@ namespace GiveCRM.DummyDataGenerator
             Log("Error: " + errorMessage);
         }
 
-        private void Log(string text)
+        public void Log(string text)
         {
             Action logAction = () =>
                                    {

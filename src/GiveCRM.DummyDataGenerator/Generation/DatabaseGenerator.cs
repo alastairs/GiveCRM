@@ -1,6 +1,5 @@
 ﻿using System;
 using Simple.Data;
-using GiveCRM.Models;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {

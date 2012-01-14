@@ -7,10 +7,10 @@ namespace GiveCRM.DummyDataGenerator.Generation
 {
     public sealed class CampaignGenerator : BaseGenerator, ICampaignGenerator
     {
-        private readonly IRepository<Campaign> campaignRepository;
         internal override string GeneratedItemType{get {return "campaigns";}}
 
         private readonly RandomSource random = new RandomSource();
+        private readonly IRepository<Campaign> campaignRepository;
         private readonly IMemberSearchFilterGenerator memberSearchFilterGenerator;
         private readonly ICampaignRunGenerator campaignRunGenerator;
 

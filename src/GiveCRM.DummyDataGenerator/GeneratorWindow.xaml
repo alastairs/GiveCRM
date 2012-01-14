@@ -75,12 +75,6 @@
                         </DockPanel>
                     </StackPanel>
                 </TabItem>
-                
-                <TabItem Header="Log">
-                    <DockPanel>
-                        <TextBox IsReadOnly="True" />
-                    </DockPanel>
-                </TabItem>
             </TabControl>
 
             <GridSplitter Grid.Row="1" Margin="0,2,0,2" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
