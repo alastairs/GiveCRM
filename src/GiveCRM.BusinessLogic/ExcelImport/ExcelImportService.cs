@@ -46,7 +46,7 @@ namespace GiveCRM.BusinessLogic.ExcelImport
         public event Action<object, ImportDataCompletedEventArgs> ImportCompleted;
         public event Action<object, ImportDataFailedEventArgs> ImportFailed;
 
-        public void Import(Stream file)
+        public void Import(ExcelFileType fileType, Stream file)
         {
             //  FIELDS THAT CANNOT BE NULL!
             //    Reference
@@ -57,9 +57,7 @@ namespace GiveCRM.BusinessLogic.ExcelImport
 
             try
             {
-                // Hard-coded for now - FIX THIS!!!
-                const ExcelFileType FileType = ExcelFileType.XLS;
-                importer.Open(file, FileType, hasHeaderRow: true);
+                importer.Open(file, fileType, hasHeaderRow: true);
 
                 const int SheetIndex = 0; // Hard-coded for now
                 IList<IDictionary<string, object>> rowsAsKeyValuePairs =
