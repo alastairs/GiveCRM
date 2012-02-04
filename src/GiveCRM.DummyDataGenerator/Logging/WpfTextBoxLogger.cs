@@ -1,17 +1,32 @@
 using System;
 using Ninject.Extensions.Logging;
+using System.Windows.Controls;
 
 namespace GiveCRM.DummyDataGenerator.Logging
 {
-    public class WpfControlLogger : ILogger
+    public class WpfTextBoxLogger : ILogger
     {
+        private readonly TextBox wpfTextBox;
+
+        public WpfTextBoxLogger(TextBox wpfTextBox)
+        {
+            if (wpfTextBox == null)
+            {
+                throw new ArgumentNullException("wpfTextBox");
+            }
+
+            this.wpfTextBox = wpfTextBox;
+        }
+
         /// <summary>
         /// Logs the specified message with Warn severity.
         /// </summary>
         /// <param name="format">The message or format template.</param>
         /// <param name="args">Any arguments required for the format template.</param>
         public void Warn(string format, params object[] args)
-        {}
+        {
+            this.Log(string.Format(format, args));
+        }
 
         /// <summary>
         /// Logs the specified exception with Warn severity.
@@ -19,7 +34,9 @@ namespace GiveCRM.DummyDataGenerator.Logging
         /// <param name="exception">The exception to log.</param>
         /// <param name="format">The message or format template.</param><param name="args">Any arguments required for the format template.</param>
         public void Warn(Exception exception, string format, params object[] args)
-        {}
+        {
+            
+        }
 
         /// <summary>
         /// Logs the specified message with Error severity.
@@ -27,7 +44,9 @@ namespace GiveCRM.DummyDataGenerator.Logging
         /// <param name="format">The message or format template.</param>
         /// <param name="args">Any arguments required for the format template.</param>
         public void Error(string format, params object[] args)
-        {}
+        {
+            this.Log(string.Format(format, args));
+        }
 
         /// <summary>
         /// Logs the specified exception with Error severity.
@@ -44,7 +63,9 @@ namespace GiveCRM.DummyDataGenerator.Logging
         /// <param name="format">The message or format template.</param>
         /// <param name="args">Any arguments required for the format template.</param>
         public void Fatal(string format, params object[] args)
-        {}
+        {
+            this.Log(string.Format(format, args));
+        }
 
         /// <summary>
         /// Logs the specified exception with Fatal severity.
@@ -54,6 +75,27 @@ namespace GiveCRM.DummyDataGenerator.Logging
         /// <param name="args">Any arguments required for the format template.</param>
         public void Fatal(Exception exception, string format, params object[] args)
         {}
+
+        /// <summary>
+        /// Logs the specified message with Info severity.
+        /// </summary>
+        /// <param name="format">The message or format template.</param>
+        /// <param name="args">Any arguments required for the format template.</param>
+        public void Info(string format, params object[] args)
+        {
+            this.Log(string.Format(format, args));
+        }
+
+        /// <summary>
+        /// Logs the specified exception with Info severity.
+        /// </summary>
+        /// <param name="exception">The exception to log.</param>
+        /// <param name="format">The message or format template.</param>
+        /// <param name="args">Any arguments required for the format template.</param>
+        public void Info(Exception exception, string format, params object[] args)
+        {
+            
+        }
 
         /// <summary>
         /// Gets the type associated with the logger.
@@ -68,7 +110,7 @@ namespace GiveCRM.DummyDataGenerator.Logging
         /// <summary>
         /// Gets a value indicating whether messages with Info severity should be logged.
         /// </summary>
-        public bool IsInfoEnabled{get {return false;}}
+        public bool IsInfoEnabled{get {return true;}}
 
         /// <summary>
         /// Gets a value indicating whether messages with Trace severity should be logged.
@@ -90,7 +132,19 @@ namespace GiveCRM.DummyDataGenerator.Logging
         /// </summary>
         public bool IsFatalEnabled{get {return true;}}
 
+        private void Log(string text)
+        {
+            Action logAction = () =>
+            {
+                wpfTextBox.Text += Environment.NewLine + text;
+                wpfTextBox.ScrollToEnd();
+            };
+
+            wpfTextBox.Dispatcher.Invoke(logAction);
+        }
+
         #region Debug, Info and Trace levels not supported.
+
         /// <summary>
         /// Logs the specified message with Debug severity.
         /// </summary>
@@ -108,27 +162,6 @@ namespace GiveCRM.DummyDataGenerator.Logging
         /// <param name="format">The message or format template.</param>
         /// <param name="args">Any arguments required for the format template.</param>
         public void Debug(Exception exception, string format, params object[] args)
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Logs the specified message with Info severity.
-        /// </summary>
-        /// <param name="format">The message or format template.</param>
-        /// <param name="args">Any arguments required for the format template.</param>
-        public void Info(string format, params object[] args)
-        {
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Logs the specified exception with Info severity.
-        /// </summary>
-        /// <param name="exception">The exception to log.</param>
-        /// <param name="format">The message or format template.</param>
-        /// <param name="args">Any arguments required for the format template.</param>
-        public void Info(Exception exception, string format, params object[] args)
         {
             throw new NotSupportedException();
         }

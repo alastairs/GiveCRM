@@ -5,6 +5,8 @@ using GiveCRM.DummyDataGenerator.Data;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
+    using Ninject.Extensions.Logging;
+
     public sealed class CampaignGenerator : BaseGenerator, ICampaignGenerator
     {
         internal override string GeneratedItemType{get {return "campaigns";}}
@@ -14,7 +16,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
         private readonly IMemberSearchFilterGenerator memberSearchFilterGenerator;
         private readonly ICampaignRunGenerator campaignRunGenerator;
 
-        public CampaignGenerator(Action<string> logAction, IRepository<Campaign> campaignRepository, IMemberSearchFilterGenerator memberSearchFilterGenerator, ICampaignRunGenerator campaignRunGenerator) : base(logAction)
+        public CampaignGenerator(IRepository<Campaign> campaignRepository, IMemberSearchFilterGenerator memberSearchFilterGenerator, ICampaignRunGenerator campaignRunGenerator, ILogger logger) : base(logger)
         {
             if (campaignRepository == null)
             {

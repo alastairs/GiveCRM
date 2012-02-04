@@ -1,20 +1,19 @@
 ﻿using GiveCRM.BusinessLogic;
-using GiveCRM.DummyDataGenerator.Generation;
 using Ninject;
 using Ninject.Extensions.Conventions;
+using GiveCRM.DummyDataGenerator.Logging;
+using Ninject.Extensions.Logging;
+using System.Windows.Controls;
 
 namespace GiveCRM.DummyDataGenerator
 {
-    using GiveCRM.DummyDataGenerator.Logging;
-
     public partial class App
     {
         protected override void OnStartup(System.Windows.StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            var uiLogger = new UILogger();
-            IKernel ninjectKernel = new StandardKernel(new LoggingModule(uiLogger.Log));
+            IKernel ninjectKernel = new StandardKernel();
             ninjectKernel.Scan(a =>
                                    {
                                        a.FromCallingAssembly();
@@ -25,11 +24,9 @@ namespace GiveCRM.DummyDataGenerator
                                        a.InSingletonScope();
                                    });
 
-            var databaseGenerator = ninjectKernel.Get<IDatabaseGenerator>();
-            var memberGenerator = ninjectKernel.Get<IMemberGenerator>();
-            var campaignGenerator = ninjectKernel.Get<ICampaignGenerator>();
-            var generatorWindow = new GeneratorWindow(databaseGenerator, memberGenerator, campaignGenerator);
-            uiLogger.LogAction = generatorWindow.Log;
+            ninjectKernel.Bind<ILogger>().To<WpfTextBoxLogger>();
+            var generatorWindow = ninjectKernel.Get<IGeneratorWindow>();
+            ninjectKernel.Bind<TextBox>().ToConstant(generatorWindow.LogBox);
             generatorWindow.Show();
         }
     }

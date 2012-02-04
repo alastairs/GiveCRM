@@ -3,16 +3,18 @@ using Simple.Data;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
+    using Ninject.Extensions.Logging;
+
     public class DatabaseGenerator : IDatabaseGenerator
     {
         private readonly RandomSource random = new RandomSource();
         private readonly dynamic db = Database.OpenNamedConnection("GiveCRM");
-        private readonly Action<string> logAction;
         private readonly IMemberGenerator memberGenerator;
         private readonly ICampaignGenerator campaignGenerator;
         private readonly IDonationGenerator donationGenerator;
+        private readonly ILogger logger;
 
-        public DatabaseGenerator(Action<string> logAction, IMemberGenerator memberGenerator, ICampaignGenerator campaignGenerator, IDonationGenerator donationGenerator)
+        public DatabaseGenerator(IMemberGenerator memberGenerator, ICampaignGenerator campaignGenerator, IDonationGenerator donationGenerator, ILogger logger)
         {
             if (memberGenerator == null)
             {
@@ -24,10 +26,15 @@ namespace GiveCRM.DummyDataGenerator.Generation
                 throw new ArgumentNullException("campaignGenerator");
             }
 
-            this.logAction = logAction;
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
             this.memberGenerator = memberGenerator;
             this.campaignGenerator = campaignGenerator;
             this.donationGenerator = donationGenerator;
+            this.logger = logger;
         }
 
         public void Generate()
@@ -36,12 +43,12 @@ namespace GiveCRM.DummyDataGenerator.Generation
             GenerateMembers();
             GenerateCampaigns();
             GenerateDonations();
-            logAction("Database generated successfully");
+            logger.Info("Database generated successfully");
         }
 
         private void EmptyDatabase()
         {
-            logAction("Emptying database...");
+            logger.Info("Emptying database...");
             db.Donations.DeleteAll();
             db.CampaignRuns.DeleteAll();
             db.MemberSearchFilters.DeleteAll();

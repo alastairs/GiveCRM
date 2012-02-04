@@ -2,24 +2,26 @@
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
+    using Ninject.Extensions.Logging;
+
     public abstract class BaseGenerator : IBaseGenerator
     {
         internal abstract string GeneratedItemType{get;}
-        protected readonly Action<string> LogAction;
+        protected ILogger Logger { get; private set; }
         public abstract void Generate(int numberToGenerate);
 
-        protected BaseGenerator(Action<string> logAction)
+        protected BaseGenerator(ILogger logger)
         {
-            this.LogAction = logAction;
+            this.Logger = logger;
         }
 
         protected void GenerateMultiple(int numberToGenerate, Action createItemCallback)
         {
             ProgressReporter reporter = new ProgressReporter(numberToGenerate);
-            LogAction(string.Format("Generating {0} {1}...", numberToGenerate, GeneratedItemType));
+            Logger.Info("Generating {0} {1}...", numberToGenerate, GeneratedItemType);
 
-            reporter.ReportProgress(createItemCallback, percent => LogAction(percent + "% complete"));
-            LogAction(string.Format("{0} {1} generated successfully", numberToGenerate, GeneratedItemType));
+            reporter.ReportProgress(createItemCallback, percent => Logger.Info(percent + "% complete"));
+            Logger.Info("{0} {1} generated successfully", numberToGenerate, GeneratedItemType);
         }
     }
 }

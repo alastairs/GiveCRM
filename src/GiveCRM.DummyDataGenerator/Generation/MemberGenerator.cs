@@ -6,6 +6,8 @@ using GiveCRM.Models;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
+    using Ninject.Extensions.Logging;
+
     public class MemberGenerator : BaseGenerator, IMemberGenerator
     {
         internal override string GeneratedItemType{get {return "members";}}
@@ -18,7 +20,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
 
         private int lastReferenceNumber;
 
-        public MemberGenerator(Action<string> logAction, IRepository<Member> memberRepository) : base(logAction)
+        public MemberGenerator(IRepository<Member> memberRepository, ILogger logger) : base(logger)
         {
             if (memberRepository == null)
             {

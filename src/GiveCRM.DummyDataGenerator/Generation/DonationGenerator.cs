@@ -5,17 +5,24 @@ using GiveCRM.Models;
 
 namespace GiveCRM.DummyDataGenerator.Generation
 {
+    using Ninject.Extensions.Logging;
+
     public sealed class DonationGenerator : IDonationGenerator
     {
         private readonly RandomSource random = new RandomSource();
-        private readonly Action<string> logAction;
         private readonly ICampaignRepository campaignRepository;
         private readonly IMemberRepository memberRepository;
         private readonly IDonationRepository donationRepository;
+        private readonly ILogger logger;
         private readonly int donationRate;
 
-        public DonationGenerator(Action<string> logAction, ICampaignRepository campaignRepository, IMemberRepository memberRepository, IDonationRepository donationRepository) 
+        public DonationGenerator(ICampaignRepository campaignRepository, IMemberRepository memberRepository, IDonationRepository donationRepository, ILogger logger) 
         {
+            if (campaignRepository == null)
+            {
+                throw new ArgumentNullException("campaignRepository");
+            }
+
             if (memberRepository == null)
             {
                 throw new ArgumentNullException("memberRepository");
@@ -26,10 +33,15 @@ namespace GiveCRM.DummyDataGenerator.Generation
                 throw new ArgumentNullException("donationRepository");
             }
 
-            this.logAction = logAction;
+            if (logger == null)
+            {
+                throw new ArgumentNullException("logger");
+            }
+
             this.campaignRepository = campaignRepository;
             this.memberRepository = memberRepository;
             this.donationRepository = donationRepository;
+            this.logger = logger;
 
             // donation rate is set somewhere between 1/3 and 2/3
             donationRate = 33 + random.NextInt(33);
@@ -37,7 +49,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
 
         public void Generate()
         {
-            logAction("Generating donations...");
+            logger.Info("Generating donations...");
             //TODO: output percentage completion like the other generators
 
             // only want to generate donations for committed campaigns
@@ -53,7 +65,7 @@ namespace GiveCRM.DummyDataGenerator.Generation
                 }
             }
 
-            logAction("Donations generated successfully");
+            logger.Info("Donations generated successfully");
         }
 
         private void GenerateCampaignDonationsForMember(Campaign campaign, Member member)

@@ -6,18 +6,25 @@ using System.Threading.Tasks;
 using System.Windows;
 using Simple.Data;
 using GiveCRM.DummyDataGenerator.Generation;
+using Ninject.Extensions.Logging;
 
 namespace GiveCRM.DummyDataGenerator
 {
-    public partial class GeneratorWindow
+    using System.Windows.Controls;
+    using Ninject;
+
+    public partial class GeneratorWindow : IGeneratorWindow
     {
         private readonly IDatabaseGenerator databaseGenerator;
         private readonly IMemberGenerator memberGenerator;
         private readonly ICampaignGenerator campaignGenerator;
 
+        [Inject]
+        public ILogger Logger { get; set; }
+
         private volatile dynamic db;
 
-        internal GeneratorWindow(IDatabaseGenerator databaseGenerator, IMemberGenerator memberGenerator, ICampaignGenerator campaignGenerator)
+        public GeneratorWindow(IDatabaseGenerator databaseGenerator, IMemberGenerator memberGenerator, ICampaignGenerator campaignGenerator)
         {
             if (databaseGenerator == null)
             {
@@ -48,12 +55,12 @@ namespace GiveCRM.DummyDataGenerator
         {
             string connectionString = DatbaseConnectionStringTextBox.Text;
             TaskScheduler uiContext = TaskScheduler.FromCurrentSynchronizationContext();
-
+            Logger.Info("Testing!!!");
             Task.Factory.StartNew(() =>
                                       {
-                                          Log("Connecting to database...");
+                                          Logger.Info("Connecting to database...");
                                           db = Database.OpenConnection(connectionString);
-                                          Log("Connected to database successfully");
+                                          Logger.Info("Connected to database successfully");
                                       }, TaskCreationOptions.LongRunning)
                         .ContinueWith(_ => RefreshStats(uiContext))
                         .ContinueWith(_ =>
@@ -71,12 +78,12 @@ namespace GiveCRM.DummyDataGenerator
 
         private void RefreshStats(TaskScheduler uiContext)
         {
-            Task.Factory.StartNew(() => Log("Refreshing database statistics..."), CancellationToken.None, TaskCreationOptions.None, uiContext)
+            Task.Factory.StartNew(() => Logger.Info("Refreshing database statistics..."), CancellationToken.None, TaskCreationOptions.None, uiContext)
                         .ContinueWith(t => new DatabaseStatisticsLoader().Load(db), TaskContinuationOptions.LongRunning)
                         .ContinueWith(t =>
                                           {
                                               DatabaseStatistics dbStats = t.Result;
-                                              Log("Database statistics refreshed successfully");
+                                              Logger.Info("Database statistics refreshed successfully");
                                               NumberOfMembersLabel.Content = dbStats.NumberOfMembers.ToString();
                                               NumberOfCampaignsLabel.Content = dbStats.NumberOfCampaigns.ToString();
                                               NumberOfSearchFiltersLabel.Content = dbStats.NumberOfSearchFilters.ToString();
@@ -132,17 +139,12 @@ namespace GiveCRM.DummyDataGenerator
             string errorMessage = t.Exception == null
                                     ? "(No exception found)"
                                     : string.Join(Environment.NewLine, t.Exception.InnerExceptions.Select(ex => ex.Message));
-            Log("Error: " + errorMessage);
+            Logger.Error("Error: " + errorMessage);
         }
 
-        public void Log(string text)
+        public TextBox LogBox
         {
-            Action logAction = () =>
-                                   {
-                                       logArea.Text += Environment.NewLine + text;
-                                       logArea.ScrollToEnd();
-                                   };
-            Dispatcher.Invoke(logAction);
+            get { return logArea; }
         }
     }
 }
